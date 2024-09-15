@@ -1,4 +1,4 @@
-import { GptMessage, MyMessage } from "../../components";
+import { GptMessage, MyMessage, TypingLoader } from "../../components";
 
 export function OrthographyPage() {
   return (
@@ -10,6 +10,8 @@ export function OrthographyPage() {
 
           {/* Preguntas */}
           <MyMessage text="¿Qué es la ortografía?" />
+
+          <TypingLoader className="fade-in" />
         </div>
       </div>
     </div>
