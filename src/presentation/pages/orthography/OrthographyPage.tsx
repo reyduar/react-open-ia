@@ -5,10 +5,13 @@ import {
   TextMessageBox,
   TypingLoader,
 } from "../../components";
+import { orthographyUseCase } from "../../../use-cases";
+import { Content } from "../../../interfaces";
 
 interface Message {
   text: string;
   isGpt: boolean;
+  content?: Content;
 }
 
 export function OrthographyPage() {
@@ -17,18 +20,13 @@ export function OrthographyPage() {
 
   const handlePost = async (text: string) => {
     setIsLoading(true);
-
-    const response = await fetch("http://localhost:5000/orthography", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ text: text }),
-    });
-
-    const data = await response.json();
-
-    setMessages((prev) => [...prev, { text: data.text, isGpt: true }]);
+    setMessages((prev) => [...prev, { text, isGpt: false }]);
+    const { ok, message, content } = await orthographyUseCase(text);
+    if (ok) {
+      setMessages((prev) => [...prev, { text: message, isGpt: true, content }]);
+    } else {
+      setMessages((prev) => [...prev, { text: message, isGpt: true }]);
+    }
 
     setIsLoading(false);
   };
@@ -43,7 +41,11 @@ export function OrthographyPage() {
           {/* Preguntas */}
           {messages.map((message, index) =>
             message.isGpt ? (
-              <GptMessage key={index} text={message.text} />
+              <GptMessage
+                key={index}
+                text={message.text}
+                content={message.content}
+              />
             ) : (
               <MyMessage key={index} text={message.text} />
             )
