@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   GptMessage,
   GptMessageProsConsDiscusser,
@@ -18,11 +18,18 @@ interface Message {
 }
 
 export function ProsConsStreamPage() {
+  const abortController = useRef(new AbortController());
+  const isRunning = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
 
   const handlePost = async (text: string) => {
+    if (isRunning.current) {
+      abortController.current.abort();
+      abortController.current = new AbortController();
+    }
     setIsLoading(true);
+    isRunning.current = true;
     setMessages((prev) => [...prev, { text, isGpt: false }]);
     // decodedStreamMessages(text);
     generatorDecodedStreamMessages(text);
@@ -30,7 +37,10 @@ export function ProsConsStreamPage() {
 
   /*Implementamos la funcion generador para extraer las lineas de text del reader */
   const generatorDecodedStreamMessages = async (text: string) => {
-    const stream = await prosConsDiscusserStreamGeneratorUseCase(text);
+    const stream = prosConsDiscusserStreamGeneratorUseCase(
+      text,
+      abortController.current.signal
+    );
     setIsLoading(false);
     setMessages((prev) => [...prev, { text: "", isGpt: true }]);
     for await (const streamText of stream) {
@@ -40,6 +50,7 @@ export function ProsConsStreamPage() {
         return newMessages;
       });
     }
+    isRunning.current = false;
   };
 
   /*Implementamos la forma tradicional de extrar text de un reader */

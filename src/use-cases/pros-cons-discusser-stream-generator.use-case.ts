@@ -1,6 +1,9 @@
 import { API_URL } from "../config/config";
 
-export async function* prosConsDiscusserStreamGeneratorUseCase(prompt: string) {
+export async function* prosConsDiscusserStreamGeneratorUseCase(
+  prompt: string,
+  abortController: AbortSignal
+) {
   try {
     const response = await fetch(`${API_URL}/pros-cons-discusser-stream`, {
       method: "POST",
@@ -8,6 +11,7 @@ export async function* prosConsDiscusserStreamGeneratorUseCase(prompt: string) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ prompt }),
+      signal: abortController,
     });
 
     if (!response.ok) {
