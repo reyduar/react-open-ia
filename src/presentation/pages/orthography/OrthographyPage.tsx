@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   GptMessage,
+  GptMessageOrthography,
   MyMessage,
   TextMessageBox,
   TypingLoader,
@@ -41,7 +42,7 @@ export function OrthographyPage() {
           {/* Preguntas */}
           {messages.map((message, index) =>
             message.isGpt ? (
-              <GptMessage
+              <GptMessageOrthography
                 key={index}
                 text={message.text}
                 content={message.content}
