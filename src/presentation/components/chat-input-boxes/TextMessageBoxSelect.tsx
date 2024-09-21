@@ -26,7 +26,7 @@ export const TextMessageBoxSelect = ({
 
     if (message.trim().length === 0) return;
 
-    onSendMessage(message, selectedOption);
+    onSendMessage(message, selectedOption || "american_english");
     setMessage("");
   };
 
