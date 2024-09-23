@@ -9,3 +9,12 @@ export const languages = [
   { id: "brazilian_portuguese", text: "Portugués" },
   { id: "russian", text: "Ruso" },
 ];
+
+export const voices = [
+  { id: "nova", text: "Nova" },
+  { id: "alloy", text: "Alloy" },
+  { id: "echo", text: "Echo" },
+  { id: "fable", text: "Fable" },
+  { id: "onyx", text: "Onyx" },
+  { id: "shimmer", text: "Shimmer" },
+];
