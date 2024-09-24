@@ -1,27 +1,19 @@
 import { useState } from "react";
 import {
   GptMessage,
-  GptMessageAudio,
+  GptMessageAudioToText,
   MyMessage,
   TypingLoader,
   TextMessageBoxFile,
 } from "../../components";
 import { audioToTextUseCase } from "../../../use-cases";
+import { Subtitle } from "../../../interfaces";
 
-interface TextMessage {
+interface Message {
   text: string;
   isGpt: boolean;
-  type: "text";
+  content?: Subtitle;
 }
-
-interface AudioMessage {
-  text: string;
-  isGpt: boolean;
-  audio: string;
-  type: "audio";
-}
-
-type Message = TextMessage | AudioMessage;
 
 const disclaimer = `
 ## Adjunte el audio que desea transcribir a texto y ingreses la instrucciones que desee que se respeten.
@@ -31,17 +23,17 @@ export function AudioToTextPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
 
-  const handlePost = async (text: string) => {
+  const handlePost = async (text: string, file: File) => {
     setIsLoading(true);
-    setMessages((prev) => [...prev, { text, isGpt: false, type: "text" }]);
-    const { ok, message, content } = await audioToTextUseCase(text);
-    setIsLoading(false);
-    if (!ok) return;
+    setMessages((prev) => [...prev, { text, isGpt: false }]);
+    const { ok, message, content } = await audioToTextUseCase(file, text);
+    if (ok) {
+      setMessages((prev) => [...prev, { text: message, isGpt: true, content }]);
+    } else {
+      setMessages((prev) => [...prev, { text: message, isGpt: true }]);
+    }
 
-    setMessages((prev) => [
-      ...prev,
-      { text: message, isGpt: true, type: "audio", audio: content! },
-    ]);
+    setIsLoading(false);
   };
 
   return (
@@ -54,15 +46,11 @@ export function AudioToTextPage() {
           {/* adio */}
           {messages.map((message, index) =>
             message.isGpt ? (
-              message.type === "audio" ? (
-                <GptMessageAudio
-                  key={index}
-                  text={message.text}
-                  audio={message.audio}
-                />
-              ) : (
-                <GptMessage key={index} text={message.text} />
-              )
+              <GptMessageAudioToText
+                key={index}
+                text={message.text}
+                content={message.content}
+              />
             ) : (
               <MyMessage key={index} text={message.text} />
             )
@@ -78,6 +66,7 @@ export function AudioToTextPage() {
       <TextMessageBoxFile
         onSendMessage={handlePost}
         placeholder="Escribe las instrucciones para la transcripción"
+        accept="audio/*"
       />
     </div>
   );

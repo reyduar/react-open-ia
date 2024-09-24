@@ -1,34 +1,43 @@
 import { API_URL } from "../config/config";
-import { SubtitleResponse, Subtitle } from "../interfaces";
+import type { SubtitleResponse, Subtitle } from "../interfaces";
+
+type Error = {
+  message: string;
+};
 
 export const audioToTextUseCase = async (
   file: File,
   prompt: string
 ): Promise<SubtitleResponse> => {
   try {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("prompt", prompt);
     const response = await fetch(`${API_URL}/audio-to-text`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ file, prompt }),
+      body: formData,
     });
 
     if (!response.ok) {
-      throw new Error("Ocurrio un error al convertir el audio a texto");
+      const errorData = await response.json(); // Extraer el error del cuerpo de la respuesta
+      throw new Error(
+        `Error ${response.status}: ${
+          errorData.message || "Something went wrong"
+        }`
+      );
     }
     const content = (await response.json()) as Subtitle;
-
     return {
       ok: true,
-      message: "*Resultado*",
+      message: "",
       content,
     };
   } catch (error) {
-    console.error(error);
+    const msg = error as Error;
+    console.error(msg);
     return {
       ok: false,
-      message: JSON.stringify(error),
+      message: msg.message,
     };
   }
 };

@@ -7,4 +7,5 @@ export interface SubtitleResponse {
 export interface Subtitle {
   language: string;
   text: string;
+  duration: number;
 }
