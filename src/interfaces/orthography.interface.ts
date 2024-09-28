@@ -1,18 +1,5 @@
-interface Translation {
-  language: string;
-  translation: string;
-}
-
-interface suggestion {
-  language: string;
-  suggestion: string;
-}
-
 export interface Content {
-  correctedText: string;
-  errorsCorrected: string[];
-  translations: Translation[];
-  suggestions: suggestion[];
+  content: string;
 }
 
 export interface OrthographyResponse {
