@@ -4,7 +4,10 @@ import {
   MyMessage,
   TypingLoader,
   TextMessageBox,
+  GptMessageImage,
 } from "../../components";
+import { imageGenerationUseCase } from "../../../use-cases";
+import { ImageGenRequest } from "../../../interfaces";
 
 interface Message {
   text: string;
@@ -24,10 +27,35 @@ export const ImageGenerationPage = () => {
     setMessages((prev) => [...prev, { text: text, isGpt: false }]);
 
     //TODO: UseCase
-
+    const genRequest: ImageGenRequest = {
+      prompt: text,
+    };
+    const response = await imageGenerationUseCase(genRequest);
     setIsLoading(false);
 
     // Todo: Añadir el mensaje de isGPT en true
+
+    if (response) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: "Imagen generada",
+          isGpt: true,
+          info: {
+            imageUrl: response.url,
+            alt: response.alt,
+          },
+        },
+      ]);
+    } else {
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: "Ocurrió un error al generar la imagen",
+          isGpt: false,
+        },
+      ]);
+    }
   };
 
   return (
@@ -39,7 +67,12 @@ export const ImageGenerationPage = () => {
 
           {messages.map((message, index) =>
             message.isGpt ? (
-              <GptMessage key={index} text="Esto es de OpenAI" />
+              <GptMessageImage
+                key={index}
+                text={message.text}
+                imageUrl={message.info?.imageUrl!}
+                alt={message.info?.alt!}
+              />
             ) : (
               <MyMessage key={index} text={message.text} />
             )

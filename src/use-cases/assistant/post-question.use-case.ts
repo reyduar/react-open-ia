@@ -12,14 +12,11 @@ export const postQuestionUseCase = async (question: Question) => {
     });
 
     if (!response.ok) {
-      throw new Error("Error al postear la pregunta");
+      throw new Error("Error to post user question");
     }
     const replies = (await response.json()) as QuestionResponse[];
-    console.log("====================================");
-    console.log(replies);
-    console.log("====================================");
     return replies;
   } catch (error) {
-    throw new Error("Ocurrio un error al postear la pregunta");
+    throw new Error("Error to post user question");
   }
 };
