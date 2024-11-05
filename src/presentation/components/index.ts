@@ -11,3 +11,4 @@ export * from "./chat-bubbles/GptMessageTranslate";
 export * from "./chat-bubbles/GptMessageAudio";
 export * from "./chat-bubbles/GptMessageAudioToText";
 export * from "./chat-bubbles/GptMessageImage";
+export * from "./chat-bubbles/GptMessageSelectableImage";
